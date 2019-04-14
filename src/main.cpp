@@ -5,6 +5,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "game.h"
+
 /**
  * Called in the event that any GLFW function fails.
  */
@@ -31,9 +33,10 @@ int main() {
     std::cout << "Window creation successful." << std::endl;
 
     // main loop
+    Game game(window);
+    game.init();
     while (!glfwWindowShouldClose(window)) {
-        // todo: game
-
+        game.update();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -41,5 +44,4 @@ int main() {
     glfwDestroyWindow(window);
     glfwTerminate();
 }
-
 
