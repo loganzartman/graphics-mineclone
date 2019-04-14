@@ -8,7 +8,7 @@ void Game::init() {
     demo_program.vertex({"test.vs"}).fragment({"test.fs"}).compile();
     
     // add some vertices the old fashioned way
-    float vertices[] = {
+    std::vector<float> vertices{
         -0.5f, -0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
          0.0f,  0.5f, 0.0f
@@ -17,9 +17,7 @@ void Game::init() {
     glGenVertexArrays(1, &demo_vao);
     glBindVertexArray(demo_vao);
     // create vbo
-    glGenBuffers(1, &demo_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, demo_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    demo_vbo.create().set_data(vertices).bind();
     // configure vertex attribs
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);

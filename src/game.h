@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 
 #include "gfx/program.h"
+#include "gfx/vbo.h"
 
 struct Game {
     Game(GLFWwindow* window) : window(window) {};
@@ -12,6 +13,7 @@ struct Game {
     GLFWwindow* window;
     
     gfx::Program demo_program = gfx::Program("demo");
-    GLuint demo_vao, demo_vbo;
+    gfx::VBO demo_vbo;
+    GLuint demo_vao;
 };
 
