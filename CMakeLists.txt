@@ -27,9 +27,3 @@ pkg_search_module(GLFW REQUIRED glfw3)
 include_directories(${GLFW_INCLUDE_DIRS})
 target_link_libraries(minecraft ${GLFW_LIBRARIES})
 
-# find glew
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-target_link_libraries(minecraft ${GLEW_LIBRARIES})
-
-
