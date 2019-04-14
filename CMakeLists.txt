@@ -17,6 +17,10 @@ find_package(glm REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
 target_link_libraries(minecraft ${GLM_LIBRARIES})
 
+# add glad
+add_subdirectory(glad)
+target_link_libraries(minecraft glad)
+
 # find glfw
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
