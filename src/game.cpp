@@ -1,27 +1,39 @@
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include "game.h"
 #include "gfx/program.h"
+#include "gfx/vao.h"
+
+struct TriInstance {
+    TriInstance(glm::vec2 position, glm::vec4 color) : position(position), color(color) {}
+    glm::vec2 position;
+    glm::vec4 color;
+};
 
 void Game::init() {
     demo_program.vertex({"test.vs"}).fragment({"test.fs"}).compile();
     
-    // add some vertices the old fashioned way
-    std::vector<float> vertices{
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
+    // instanced rendering demo: draw two triangles with per-instance position/color
+    std::vector<glm::vec3> tri_vertices{
+        {-0.5f, -0.5f, 0.0f},
+        { 0.5f, -0.5f, 0.0f},
+        { 0.0f,  0.5f, 0.0f}
     };
-    // create vao
-    glGenVertexArrays(1, &demo_vao);
-    glBindVertexArray(demo_vao);
-    // create vbo
-    demo_vbo.create().set_data(vertices).bind();
-    // configure vertex attribs
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
+    std::vector<TriInstance> tri_instances{
+        TriInstance(glm::vec2(0, 0), glm::vec4(1, 0, 0, 1)),
+        TriInstance(glm::vec2(0.2, 0.2), glm::vec4(0, 1, 0, 1))
+    };
+
+    // define the layout of the VAO
+    // there is a single non-instanced attribute (the vertex position)
+    demo_vao.set_vertex_sizes({3});
+    // there are two attributes for each instance (position, color)
+    demo_vao.set_instance_sizes({2, 4});
+
+    // load the data into its buffers
+    demo_vao.vertices.set_data(tri_vertices);
+    demo_vao.instances.set_data(tri_instances);
 }
 
 void Game::update() {
@@ -35,7 +47,7 @@ void Game::update() {
     glUniform2i(demo_program.uniform_loc("resolution"), window_w, window_h);
     glUniform1f(demo_program.uniform_loc("time"), glfwGetTime());
 
-    glBindVertexArray(demo_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    demo_vao.bind();
+    glDrawArraysInstanced(GL_TRIANGLES, 0, demo_vao.vertices.size(), demo_vao.instances.size());
 }
 

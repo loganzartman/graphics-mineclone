@@ -1,9 +1,10 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include "gfx/program.h"
-#include "gfx/vbo.h"
+#include "gfx/vao.h"
 
 struct Game {
     Game(GLFWwindow* window) : window(window) {};
@@ -13,7 +14,5 @@ struct Game {
     GLFWwindow* window;
     
     gfx::Program demo_program = gfx::Program("demo");
-    gfx::VBO demo_vbo;
-    GLuint demo_vao;
+    gfx::VAO demo_vao;
 };
-

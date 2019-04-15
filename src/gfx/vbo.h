@@ -20,6 +20,7 @@ public:
     }
 
     void bind() {
+        if (!id) { create(); }
         glBindBuffer(GL_ARRAY_BUFFER, id);
     }
 
@@ -32,6 +33,7 @@ public:
         bind();
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), vertices.data(), usage);
         unbind();
+        _size = vertices.size();
         return *this;
     }
 
