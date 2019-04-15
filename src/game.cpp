@@ -26,10 +26,11 @@ void Game::init() {
     };
 
     // define the layout of the VAO
+    // attributes are defined in order 
     // there is a single non-instanced attribute (the vertex position)
-    demo_vao.set_vertex_sizes({3});
+    demo_vao.add_attribs({3});
     // there are two attributes for each instance (position, color)
-    demo_vao.set_instance_sizes({2, 4});
+    demo_vao.add_instanced_attribs({2, 4});
 
     // load the data into its buffers
     demo_vao.vertices.set_data(tri_vertices);

@@ -8,6 +8,18 @@
 #include "vbo.h"
 
 namespace gfx {
+/**
+ * An abstraction for a vertex attribute object that supports instanced 
+ * rendering. Contains a buffer for non-instanced vertex data, and, optionally,
+ * a buffer for instanced (per-instance) vertex data.
+ *
+ * Vertex attributes must be added in order (as specified using the layout 
+ * specifier in a vertex shader) using either add_attribs() for vertex 
+ * attributes which have one set of values for all instances, or 
+ * add_instranced_attribs() for attributes which have one set of values for
+ * each instance. The size (in vector components) for each attribute must be
+ * specified.
+ */
 class VAO {
 public:
     VAO() {}
@@ -22,21 +34,20 @@ public:
     }
 
     /**
-     * Set the size in bytes of each vertex attribute, in order.
-     * Vertex attributes are attributes that are shared by each instance if
-     * instanced rendering is used.
+     * Add non-instanced attributes.
+     * Specify the size of each attribute.
      */
-    VAO& set_vertex_sizes(std::initializer_list<size_t> sizes) {
-        set_layout(sizes, false);
+    VAO& add_attribs(std::initializer_list<size_t> sizes) {
+        add_attribs(sizes, false);
         return *this;
     }
 
     /**
-     * Set the size in bytes of each instanced attribute, in order.
-     * Instanced vertex attributes have different values for each instance.
+     * Add instanced attributes.
+     * Specify the size of each attribute.
      */
-    VAO& set_instance_sizes(std::initializer_list<size_t> sizes) {
-        set_layout(sizes, true);
+    VAO& add_instanced_attribs(std::initializer_list<size_t> sizes) {
+        add_attribs(sizes, true);
         return *this;
     }
 
@@ -59,7 +70,7 @@ private:
      * Automatically computes glVertexAttribPointer parameters and sets vertex
      * attribute divisor if using instanced rendering.
      */
-    void set_layout(std::initializer_list<size_t> sizes, bool instanced) {
+    void add_attribs(std::initializer_list<size_t> sizes, bool instanced) {
         bind();
         if (instanced) { instances.bind(); }
         else { vertices.bind(); }
