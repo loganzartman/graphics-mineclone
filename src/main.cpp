@@ -39,6 +39,12 @@ int main() {
         game.update();
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        // collect any GL errors
+        GLenum err;
+        while ((err = glGetError()) != GL_NO_ERROR) {
+            std::cerr << "Uncaught GL error: 0x" << std::hex << err << std::endl;
+        }
     }
 
     glfwDestroyWindow(window);
