@@ -52,6 +52,7 @@ public:
     GLuint id = 0;
     VBO vertices;  // non-instanced vertex data
     VBO instances; // per-instance data
+    size_t attrib_index = 0;
 
 private:
     /**
@@ -68,15 +69,14 @@ private:
             stride += size;
         }
 
-        size_t index = 0;
         size_t offset = 0;
         for (size_t size : sizes) {
-            glEnableVertexAttribArray(index);
+            glEnableVertexAttribArray(attrib_index);
             // arbitrarily represent all data as floats
-            glVertexAttribPointer(index, size, GL_FLOAT, false, stride * sizeof(float), (void*)offset);
-            if (instanced) { glVertexAttribDivisor(index, 1); }
+            glVertexAttribPointer(attrib_index, size, GL_FLOAT, false, stride * sizeof(float), (void*)offset);
+            if (instanced) { glVertexAttribDivisor(attrib_index, 1); }
             offset += size * sizeof(float);
-            ++index;
+            ++attrib_index;
         }
 
         unbind();
