@@ -13,6 +13,7 @@ struct Game {
     void update();
 
     GLFWwindow* window;
+    glm::vec2 mouse_position;
     
     gfx::Program cube_program = gfx::Program("cube");
     Cubes cubes;

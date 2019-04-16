@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <iostream>
 #include "game.h"
 #include "gfx/program.h"
 #include "gfx/vao.h"
@@ -40,7 +40,6 @@ void Game::update() {
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.2f,0.2f,0.2f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     glm::mat4 projection_matrix = glm::perspective(
         glm::radians(80.f),
         ((float)window_w)/window_h,
