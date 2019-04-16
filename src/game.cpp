@@ -7,12 +7,6 @@
 #include "gfx/program.h"
 #include "gfx/vao.h"
 
-struct TriInstance {
-    TriInstance(glm::vec2 position, glm::vec4 color) : position(position), color(color) {}
-    glm::vec2 position;
-    glm::vec4 color;
-};
-
 struct CubeInstance {
     CubeInstance(glm::vec3 position, glm::vec4 color) : position(position), color(color) {}
     glm::vec3 position;
@@ -36,22 +30,18 @@ void Game::init() {
         {0.0f, 1.0f, 0.0f},
         {1.0f, 1.0f, 0.0f},
         {1.0f, 1.0f, 1.0f}
-
     };
-
 
     // define the layout of the VAO
     // attributes are defined in order 
     // there is a single non-instanced attribute (the vertex position)
+    cube_vao.add_attribs({3});
     // there are two attributes for each instance (position, color)
+    cube_vao.add_instanced_attribs({3, 4});
 
     // load the data into its buffers
-
-    cube_vao.add_attribs({3});
-    cube_vao.add_instanced_attribs({3, 4});
     cube_vao.vertices.set_data(cube_vertices);
     cube_vao.instances.set_data(cube_instances);
-
 }
 
 void Game::update() {
@@ -62,7 +52,7 @@ void Game::update() {
     glClearColor(0.2f,0.2f,0.2f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      std::vector<glm::uvec3> cube_indices{
+    const std::vector<glm::uvec3> cube_indices{
         {0, 1, 2},
         {2, 3, 0},
         {0, 5, 4},
