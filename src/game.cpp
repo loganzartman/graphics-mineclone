@@ -20,7 +20,7 @@ struct CubeInstance {
 };
 
 void Game::init() {
-    cube_program.vertex({"cube.vs"}).fragment({"cube.fs"}).compile();
+    cube_program.vertex({"cube.vs"}).fragment({"cube.fs"}).geometry({"cube.gs"}).compile();
 
     std::vector<CubeInstance> cube_instances{
         CubeInstance(glm::vec3(0, 0, 0), glm::vec4(1,0,0,1)),
@@ -56,10 +56,11 @@ void Game::init() {
 
 void Game::update() {
     int window_w, window_h;
+    glEnable(GL_DEPTH_TEST);
     glfwGetFramebufferSize(window, &window_w, &window_h);
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.2f,0.2f,0.2f,1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       std::vector<glm::uvec3> cube_indices{
         {0, 1, 2},
