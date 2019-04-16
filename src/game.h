@@ -13,6 +13,6 @@ struct Game {
 
     GLFWwindow* window;
     
-    gfx::Program demo_program = gfx::Program("demo");
-    gfx::VAO demo_vao;
+    gfx::Program cube_program = gfx::Program("cube");
+    gfx::VAO cube_vao;
 };
