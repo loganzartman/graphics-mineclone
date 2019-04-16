@@ -1,4 +1,5 @@
 #include <random>
+#include <cmath>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -17,13 +18,13 @@ void Game::init() {
     std::uniform_int_distribution<int> height(1,3);
 
     std::vector<Cubes::Instance> cube_instances;
-    for (int x = -100; x <= 100; ++x) {
-        for (int z = -100; z <= 100; ++z) {
+    for (int x = -50; x <= 50; ++x) {
+        for (int z = -50; z <= 50; ++z) {
             int h = height(generator);
             for (int y = 0; y < h; ++y) { 
                 cube_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
-                    glm::vec4(x/5. / 2 + 0.5, z/5. / 2 + 0.5, 0, 1)
+                    glm::vec4(x/50. / 2 + 0.5, z/50. / 2 + 0.5, 0, 1)
                 ));
             }
         }
@@ -41,11 +42,15 @@ void Game::update() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 projection_matrix = glm::perspective(
-        glm::radians(100.f),
+        glm::radians(80.f),
         ((float)window_w)/window_h,
         0.1f,
         100.f
-    ) * glm::lookAt(glm::vec3(0,6,-6), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    ) * glm::lookAt(
+        glm::vec3(sin(glfwGetTime()) * 20, 20, cos(glfwGetTime()) * 20), 
+        glm::vec3(0,0,0), 
+        glm::vec3(0,1,0)
+    );
 
     cube_program.use();
     glUniformMatrix4fv(cube_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
