@@ -41,13 +41,14 @@ void Game::init() {
 
 
     // define the layout of the VAO
+    // attributes are defined in order 
     // there is a single non-instanced attribute (the vertex position)
     // there are two attributes for each instance (position, color)
 
     // load the data into its buffers
 
-    cube_vao.set_vertex_sizes({3});
-    cube_vao.set_instance_sizes({3, 4});
+    cube_vao.add_attribs({3});
+    cube_vao.add_instanced_attribs({3, 4});
     cube_vao.vertices.set_data(cube_vertices);
     cube_vao.instances.set_data(cube_instances);
 
