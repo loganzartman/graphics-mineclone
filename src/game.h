@@ -5,6 +5,7 @@
 
 #include "gfx/program.h"
 #include "gfx/vao.h"
+#include "cubes.h"
 
 struct Game {
     Game(GLFWwindow* window) : window(window) {};
@@ -14,5 +15,5 @@ struct Game {
     GLFWwindow* window;
     
     gfx::Program cube_program = gfx::Program("cube");
-    gfx::VAO cube_vao;
+    Cubes cubes;
 };
