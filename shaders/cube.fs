@@ -1,4 +1,3 @@
-#version 330 core
 in vec4 gs_color;
 in vec4 light_direction;
 flat in vec4 normal;
