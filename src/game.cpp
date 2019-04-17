@@ -17,6 +17,8 @@
 
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
+    render_tex.set_texture_size(window);
+    display_quad.set_texture(render_tex.color_id);
     
     std::default_random_engine generator;
     std::uniform_int_distribution<int> height(1,3);
@@ -46,21 +48,14 @@ void Game::init() {
 
 void Game::update() {
     int window_w, window_h;
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glfwGetFramebufferSize(window, &window_w, &window_h);
-    glViewport(0, 0, window_w, window_h);
-    glClearColor(0.2f,0.2f,0.2f,1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
     glm::mat4 view_matrix = glm::lookAt(glm::vec3(player_position), glm::vec3(player_position) + look, up);
     glm::mat4 projection_matrix = glm::perspective(
         glm::radians(80.f),
         ((float)window_w)/window_h,
         0.1f,
-        100.f
+        1000.f
     ) * view_matrix;
 
     if(moving_forward) {
@@ -71,9 +66,25 @@ void Game::update() {
         const glm::vec3 tangent = glm::cross(-look, up);
 	    player_position +=  (glm::vec4(tangent, 0) * movement_speed * sideways_direction);
     }
-    cube_program.use();
-    glUniformMatrix4fv(cube_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
-    cubes.draw();
+
+    glViewport(0, 0, window_w, window_h);
+    glClearColor(0.f,0.f,0.f,1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    render_tex.bind_framebuffer();
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glViewport(0, 0, window_w, window_h);
+        glClearColor(0.2f,0.2f,0.2f,1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        cube_program.use();
+        glUniformMatrix4fv(cube_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
+        cubes.draw();
+    render_tex.unbind_framebuffer();
+
+    display_quad.draw();
 }
 
 void Game::updateOrientation() {

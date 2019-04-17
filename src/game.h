@@ -5,7 +5,9 @@
 
 #include "gfx/program.h"
 #include "gfx/vao.h"
+#include "gfx/rendertexture.h"
 #include "cubes.h"
+#include "texquad.h"
 
 struct Game {
     Game(GLFWwindow* window) : window(window) {};
@@ -29,4 +31,7 @@ struct Game {
 
     gfx::Program cube_program = gfx::Program("cube");
     Cubes cubes;
+
+    gfx::RenderTexture render_tex;
+    TexQuad display_quad;
 };
