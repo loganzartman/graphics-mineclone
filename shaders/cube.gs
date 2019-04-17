@@ -3,6 +3,7 @@ layout (triangle_strip, max_vertices = 3) out;
 flat in int vs_block_type[3];
 in vec3 vs_uvw[3];
 uniform mat4 projection;
+uniform mat4 view;
 flat out vec4 normal;
 const vec4 light_position = vec4(300,1000,-300,0);
 out vec4 light_direction;
@@ -21,7 +22,7 @@ void main() {
 	for (n = 0; n < gl_in.length(); n++) {
 		light_direction = light_position - gl_in[n].gl_Position;
 		vertex_pos= gl_in[n].gl_Position;
-		gl_Position = projection * gl_in[n].gl_Position;
+		gl_Position = projection * view * gl_in[n].gl_Position;
 		barycentric = barycentric_vals[n];
         block_type = vs_block_type[n];
 		uvw = vs_uvw[n];

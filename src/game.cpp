@@ -17,13 +17,15 @@
 
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
+    water_program.vertex({"cube.vs"}).fragment({"water.fs"}).geometry({"cube.gs"}).compile();
+    background_tex.set_texture_size(window);
     render_tex.set_texture_size(window);
-    display_quad.set_texture(render_tex.color_id);
     
     std::default_random_engine generator;
     std::uniform_int_distribution<int> height(1,3);
 
     std::vector<Cubes::Instance> cube_instances;
+    std::vector<Cubes::Instance> water_instances;
     for (int x = -100; x <= 100; ++x) {
         for (int z = -100; z <= 100; ++z) {
             float f = noise::perlin3d({x * 0.02, 0, z * 0.02}, 3, 0.5);
@@ -35,7 +37,7 @@ void Game::init() {
                 ));
             }
             for (int y = h; y <= -5; ++y) {
-                cube_instances.emplace_back(Cubes::Instance(
+                water_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
                     4
                 ));
@@ -44,6 +46,7 @@ void Game::init() {
     }
 
     cubes.vao.instances.set_data(cube_instances);
+    water_cubes.vao.instances.set_data(water_instances);
 }
 
 void Game::update() {
@@ -56,7 +59,7 @@ void Game::update() {
         ((float)window_w)/window_h,
         0.1f,
         1000.f
-    ) * view_matrix;
+    );
 
     if(moving_forward) {
         player_position += (glm::vec4(look, 0) * forward_direction * movement_speed ); 
@@ -71,7 +74,7 @@ void Game::update() {
     glClearColor(0.f,0.f,0.f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    render_tex.bind_framebuffer();
+    background_tex.bind_framebuffer();
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -81,10 +84,26 @@ void Game::update() {
 
         cube_program.use();
         glUniformMatrix4fv(cube_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
+        glUniformMatrix4fv(cube_program.uniform_loc("view"), 1, false, glm::value_ptr(view_matrix));
         cubes.draw();
-    render_tex.unbind_framebuffer();
+    background_tex.unbind_framebuffer();
 
-    display_quad.draw();
+    glEnable(GL_DEPTH_TEST);
+    display_quad.set_texture(background_tex.color_id).set_depth(background_tex.depth_id).draw();
+
+    water_program.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, background_tex.color_id);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, background_tex.depth_id);
+    glUniform1i(water_program.uniform_loc("background"), 0);
+    glUniform1i(water_program.uniform_loc("depth"), 1);
+    glUniform1f(water_program.uniform_loc("z_near"), 0.1f);
+    glUniform1f(water_program.uniform_loc("z_far"), 1000.f);
+    glUniformMatrix4fv(water_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
+    glUniformMatrix4fv(water_program.uniform_loc("view"), 1, false, glm::value_ptr(view_matrix));
+    glUniform2i(water_program.uniform_loc("resolution"), window_w, window_h);
+    water_cubes.draw();
 }
 
 void Game::updateOrientation() {

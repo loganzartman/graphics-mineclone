@@ -30,8 +30,11 @@ struct Game {
     glm::vec3 up = glm::vec3(0,1,0);
 
     gfx::Program cube_program = gfx::Program("cube");
+    gfx::Program water_program = gfx::Program("cube_water");
     Cubes cubes;
+    Cubes water_cubes;
 
+    gfx::RenderTexture background_tex;
     gfx::RenderTexture render_tex;
     TexQuad display_quad;
 };

@@ -68,9 +68,9 @@ public:
         if (fragment_id) { glDeleteShader(fragment_id); }
     }
 
-    GLint uniform_loc(std::string name) {
-        GLint location = glGetUniformLocation(id, name.c_str());
-        if (location < 0) { throw std::runtime_error("Invalid uniform name: " + name); }
+    GLint uniform_loc(std::string uname) {
+        GLint location = glGetUniformLocation(id, uname.c_str());
+        if (location < 0) { std::cerr << "Warning in " << name << ": invalid or unused uniform: " << uname << std::endl; }
         return location;
     }
     
