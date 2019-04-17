@@ -10,6 +10,7 @@
 #include "../util.h"
 
 namespace gfx {
+static std::string shader_prepend = "#version 330 core\n";
 static std::string shader_root = "shaders";
 
 class Program {
@@ -90,6 +91,7 @@ private:
      */
     std::string read_sources(std::initializer_list<std::string> srcs) {
         std::stringstream result;
+        result << shader_prepend;
         for (auto& src : srcs) {
             result << file_read(shader_root + "/" + src) << std::endl;
         }

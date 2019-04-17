@@ -1,3 +1,4 @@
+#include <iostream>
 #include <random>
 #include <cmath>
 
@@ -11,6 +12,7 @@
 #include "gfx/program.h"
 #include "gfx/vao.h"
 #include "cubes.h"
+#include "noise.h"
 
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"cube.fs"}).geometry({"cube.gs"}).compile();
@@ -19,13 +21,14 @@ void Game::init() {
     std::uniform_int_distribution<int> height(1,3);
 
     std::vector<Cubes::Instance> cube_instances;
-    for (int x = -50; x <= 50; ++x) {
-        for (int z = -50; z <= 50; ++z) {
-            int h = height(generator);
-            for (int y = 0; y < h; ++y) { 
+    for (int x = -100; x <= 100; ++x) {
+        for (int z = -100; z <= 100; ++z) {
+            float f = noise::perlin3d({x * 0.02, 0, z * 0.02}, 3, 0.5) * 10;
+            int h = (int)(f + 5);
+            for (int y = h; y <= h; ++y) { 
                 cube_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
-                    glm::vec4(x/50. / 2 + 0.5, z/50. / 2 + 0.5, 0, 1)
+                    glm::vec4(x/100. / 2 + 0.5, z/100. / 2 + 0.5, 0, 1)
                 ));
             }
         }

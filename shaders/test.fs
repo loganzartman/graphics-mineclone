@@ -1,4 +1,3 @@
-#version 330 core
 in vec4 vs_color;
 uniform ivec2 resolution;
 uniform float time;
