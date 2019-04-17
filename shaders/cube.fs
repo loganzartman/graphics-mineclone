@@ -25,6 +25,10 @@ vec4 stone_sample(vec4 vertex_pos, vec3 uvw) {
     return vec4(vec3(f) * vec3(0.6, 0.59, 0.62), 1.);
 }
 
+vec4 water_sample(vec4 vertex_pos, vec3 uvw) {
+    return vec4(0.2, 0.4, 1.0, 0.4);
+}
+
 void main() {
     // wow nice moves
 	float dot_nl = dot(normalize(light_direction), normalize(normal));
@@ -41,6 +45,9 @@ void main() {
     else if (block_type == 3) {
         color = stone_sample(vertex_pos, uvw);
     }
+    else if (block_type == 4) {
+        color = water_sample(vertex_pos, uvw);
+    }
     
-	gl_FragColor = clamp(color * light, 0.0, 1.0);
+	gl_FragColor = clamp(vec4(color.rgb * light, color.a), 0.0, 1.0);
 }

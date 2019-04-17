@@ -32,6 +32,12 @@ void Game::init() {
                     (f < 0 ? 1 : f < 0.1 ? 2 : 3)
                 ));
             }
+            for (int y = h; y <= -5; ++y) {
+                cube_instances.emplace_back(Cubes::Instance(
+                    glm::vec3(x, y, z),
+                    4
+                ));
+            }
         }
     }
 
@@ -41,6 +47,8 @@ void Game::init() {
 void Game::update() {
     int window_w, window_h;
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glfwGetFramebufferSize(window, &window_w, &window_h);
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.2f,0.2f,0.2f,1.0f);
