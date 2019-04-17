@@ -18,7 +18,7 @@ struct Game {
     glm::vec2 mouse_position = glm::vec2(-1,-1);
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
     float mouse_speed = 0.003;
-    glm::vec4 player_position = glm::vec4(0,5,0,1);
+    glm::vec4 player_position = glm::vec4(0,7,0,1);
     glm::vec3 look = glm::vec3(0,0,1);
     glm::vec3 up = glm::vec3(0,1,0);
 
