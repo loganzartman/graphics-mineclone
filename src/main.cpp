@@ -1,9 +1,12 @@
 #include <iostream>
 #include <sstream>
 #include <exception>
-
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtx/string_cast.hpp>
 
 #include "game.h"
 
@@ -30,10 +33,17 @@ KeyCallback(GLFWwindow* window,
 
 void
 MousePosCallback(GLFWwindow* window, double mouse_x, double mouse_y)
-{
-	glm::vec2 mouse_pos = glm::vec2(mouse_x, mouse_y);
+{   
     Game* game = (Game*)glfwGetWindowUserPointer(window);
-    game->mouse_position = mouse_pos;
+    bool first = game->mouse_position == glm::vec2(-1,-1);
+    float dx = mouse_x - game->mouse_position.x;
+    float dy = mouse_y - game->mouse_position.y;
+    game->mouse_position = glm::vec2(mouse_x, mouse_y);
+    game->mouse_pos_vector = -glm::vec2(dx,dy);
+    if (first) return;
+
+    game->updateOrientation();
+
 }
 
 void

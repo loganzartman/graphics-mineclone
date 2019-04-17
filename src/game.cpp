@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "game.h"
@@ -40,19 +41,38 @@ void Game::update() {
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.2f,0.2f,0.2f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glm::mat4 view_matrix = glm::lookAt(glm::vec3(player_position), glm::vec3(player_position) + look, up);
     glm::mat4 projection_matrix = glm::perspective(
         glm::radians(80.f),
         ((float)window_w)/window_h,
         0.1f,
         100.f
-    ) * glm::lookAt(
-        glm::vec3(sin(glfwGetTime()) * 20, 20, cos(glfwGetTime()) * 20), 
-        glm::vec3(0,0,0), 
-        glm::vec3(0,1,0)
-    );
-
+    ) * view_matrix;
+    
     cube_program.use();
     glUniformMatrix4fv(cube_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
     cubes.draw();
+}
+
+void Game::updateOrientation() {
+    if (glm::length(mouse_pos_vector) == 0) {
+		return;}
+	mouse_pos_vector.x *= -1.f;
+    int window_w, window_h;
+    glfwGetFramebufferSize(window, &window_w, &window_h);
+     glm::mat4 projection_matrix = glm::perspective(
+        glm::radians(80.f),
+        ((float)window_w)/window_h,
+        0.1f,
+        100.f
+    );
+
+    glm::mat4 view_matrix = glm::lookAt(glm::vec3(player_position), glm::vec3(player_position) + look, up);
+
+	const glm::vec3 world_vector = glm::vec3(glm::inverse(projection_matrix * view_matrix) * glm::vec4(mouse_pos_vector, 1., 1.));
+	const glm::vec3 rotation_axis = glm::cross(look, world_vector);
+	const glm::mat4 rotation = glm::rotate(mouse_speed * glm::length(mouse_pos_vector), rotation_axis);
+	look = glm::vec3(rotation * glm::vec4(look, 0.));
 }
 
