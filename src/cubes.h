@@ -11,8 +11,8 @@ struct Cubes {
         // attributes are defined in order 
         // there is a single non-instanced attribute (the vertex position)
         vao.add_attribs({3});
-        // there are two attributes for each instance (position, color)
-        vao.add_instanced_attribs({3, 4});
+        // there are two attributes for each instance (position, block type)
+        vao.add_instanced_attribs({3, 1});
 
         // load the vertex data 
         vao.vertices.set_data(cube_vertices);
@@ -27,9 +27,9 @@ struct Cubes {
     gfx::VAO vao;
 
     struct Instance {
-        Instance(glm::vec3 position, glm::vec4 color) : position(position), color(color) {}
+        Instance(glm::vec3 position, int block_type) : position(position), block_type(block_type) {}
         glm::vec3 position;
-        glm::vec4 color;
+        int block_type;
     };
 
     std::vector<glm::vec3> cube_vertices{
