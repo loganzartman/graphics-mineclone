@@ -45,6 +45,11 @@ void Game::init() {
         }
     }
 
+    cube_instances.emplace_back(Cubes::Instance(
+        glm::vec3(0, 10, 0),
+        0
+    ));
+
     cubes.vao.instances.set_data(cube_instances);
     water_cubes.vao.instances.set_data(water_instances);
 }
@@ -76,6 +81,8 @@ void Game::update() {
 
     background_tex.bind_framebuffer();
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glViewport(0, 0, window_w, window_h);
