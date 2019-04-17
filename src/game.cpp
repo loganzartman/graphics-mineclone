@@ -96,13 +96,17 @@ void Game::update() {
     glBindTexture(GL_TEXTURE_2D, background_tex.color_id);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, background_tex.depth_id);
+
     glUniform1i(water_program.uniform_loc("background"), 0);
     glUniform1i(water_program.uniform_loc("depth"), 1);
     glUniform1f(water_program.uniform_loc("z_near"), 0.1f);
     glUniform1f(water_program.uniform_loc("z_far"), 1000.f);
+    glUniform1f(water_program.uniform_loc("time"), glfwGetTime());
+    glUniform3fv(water_program.uniform_loc("look"), 1, glm::value_ptr(look));
     glUniformMatrix4fv(water_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
     glUniformMatrix4fv(water_program.uniform_loc("view"), 1, false, glm::value_ptr(view_matrix));
     glUniform2i(water_program.uniform_loc("resolution"), window_w, window_h);
+    
     water_cubes.draw();
 }
 
