@@ -15,7 +15,7 @@
 #include "noise.h"
 
 void Game::init() {
-    cube_program.vertex({"cube.vs"}).fragment({"perlin.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
+    cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
     
     std::default_random_engine generator;
     std::uniform_int_distribution<int> height(1,3);

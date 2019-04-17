@@ -3,10 +3,11 @@ layout (location = 1) in vec3 position;
 layout (location = 2) in vec4 color;
 
 out vec4 vs_color;
+out vec3 vs_uvw;
 
 void main() {
     vs_color = color;
     gl_Position = vec4(vertex_pos + position, 1.0);
-
+    vs_uvw = vertex_pos;
 }
 

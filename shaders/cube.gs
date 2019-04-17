@@ -1,11 +1,13 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
 in vec4 vs_color[3];
+in vec3 vs_uvw[3];
 uniform mat4 projection;
 flat out vec4 normal;
-const vec4 light_position = vec4(30,100,-30,0);
+const vec4 light_position = vec4(300,1000,-300,0);
 out vec4 light_direction;
 out vec4 vertex_pos;
+out vec3 uvw;
 out vec4 gs_color;
 
 out vec3 barycentric;
@@ -22,6 +24,7 @@ void main() {
 		gl_Position = projection * gl_in[n].gl_Position;
 		barycentric = barycentric_vals[n];
         gs_color = vs_color[n];
+		uvw = vs_uvw[n];
 		EmitVertex();
 	}
 	EndPrimitive();
