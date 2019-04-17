@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include <glad/glad.h>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
@@ -23,12 +24,12 @@ void Game::init() {
     std::vector<Cubes::Instance> cube_instances;
     for (int x = -100; x <= 100; ++x) {
         for (int z = -100; z <= 100; ++z) {
-            float f = noise::perlin3d({x * 0.02, 0, z * 0.02}, 3, 0.5) * 10;
-            int h = (int)(f + 5);
-            for (int y = h; y <= h; ++y) { 
+            float f = noise::perlin3d({x * 0.02, 0, z * 0.02}, 3, 0.5);
+            int h = (int)(f * 20);
+            for (int y = h - 1; y <= h; ++y) { 
                 cube_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
-                    glm::vec4(x/100. / 2 + 0.5, z/100. / 2 + 0.5, 0, 1)
+                    (f < 0 ? 1 : f < 0.1 ? 2 : 3)
                 ));
             }
         }
