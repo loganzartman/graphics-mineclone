@@ -45,6 +45,7 @@ void Game::update() {
     glClearColor(0.2f,0.2f,0.2f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
     glm::mat4 view_matrix = glm::lookAt(glm::vec3(player_position), glm::vec3(player_position) + look, up);
     glm::mat4 projection_matrix = glm::perspective(
         glm::radians(80.f),
@@ -52,7 +53,15 @@ void Game::update() {
         0.1f,
         100.f
     ) * view_matrix;
-    
+
+    if(moving_forward) {
+        player_position += (glm::vec4(look, 0) * forward_direction * movement_speed ); 
+    }
+
+    if(moving_sideways) {
+        const glm::vec3 tangent = glm::cross(-look, up);
+	    player_position +=  (glm::vec4(tangent, 0) * movement_speed * sideways_direction);
+    }
     cube_program.use();
     glUniformMatrix4fv(cube_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
     cubes.draw();

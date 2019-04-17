@@ -26,9 +26,36 @@ KeyCallback(GLFWwindow* window,
             int action,
             int mods)
 {
+    Game* game = (Game*)glfwGetWindowUserPointer(window);
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+        game->moving_forward = true;
+        game->forward_direction = 1;
+    }
+    if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+        game->moving_forward = true;
+        game->forward_direction = -1;
+    }
+    if ( (key == GLFW_KEY_W || key == GLFW_KEY_S) && action == GLFW_RELEASE)
+        game->moving_forward = false;
+    
+    if ( (key == GLFW_KEY_A || key == GLFW_KEY_D) && action == GLFW_RELEASE)
+        game->moving_sideways = false;
+
+
+
+    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+        game->moving_sideways = true;
+        game->sideways_direction = 1;
+    }
+
+    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+        game->moving_sideways = true;
+        game->sideways_direction = -1;
+    }
+               // eye_ = eye_  + look_ * zoom_speed * direction;
 }
 
 void

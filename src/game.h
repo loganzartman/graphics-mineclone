@@ -17,6 +17,11 @@ struct Game {
     GLFWwindow* window;
     glm::vec2 mouse_position = glm::vec2(-1,-1);
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
+    bool moving_forward = false;
+    bool moving_sideways = false;
+    float forward_direction = 1;
+    float sideways_direction = 1;
+    float movement_speed = 0.5;
     float mouse_speed = 0.003;
     glm::vec4 player_position = glm::vec4(0,7,0,1);
     glm::vec3 look = glm::vec3(0,0,1);
