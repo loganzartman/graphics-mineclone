@@ -99,6 +99,7 @@ int main() {
     glfwSetKeyCallback(window, KeyCallback);
 	glfwSetCursorPosCallback(window, MousePosCallback);
 	glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     std::cout << "Window creation successful." << std::endl;
 
