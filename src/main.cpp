@@ -31,35 +31,15 @@ KeyCallback(GLFWwindow* window,
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-        game->moving_forward = true;
-        game->forward_direction = 1;
-    }
-    if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-        game->moving_forward = true;
-        game->forward_direction = -1;
-    }
-    if ( (key == GLFW_KEY_W || key == GLFW_KEY_S) && action == GLFW_RELEASE)
-        game->moving_forward = false;
-    
-    if ( (key == GLFW_KEY_A || key == GLFW_KEY_D) && action == GLFW_RELEASE)
-        game->moving_sideways = false;
 
-
-
-    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-        game->moving_sideways = true;
-        game->sideways_direction = 1;
-    }
-
-    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-        game->moving_sideways = true;
-        game->sideways_direction = -1;
-    }
-
-    if (key == GLFW_KEY_F && mods == GLFW_MOD_CONTROL && action == GLFW_RELEASE) {
+    if (key == GLFW_KEY_F && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
         game->gravity_switch = !game->gravity_switch;
     }
+
+    if (action == GLFW_PRESS)
+        game->key_pressed[key] = true;
+    if (action == GLFW_RELEASE)
+        game->key_pressed[key] = false;
 }
 
 void

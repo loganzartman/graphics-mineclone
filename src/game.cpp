@@ -61,7 +61,7 @@ void Game::update() {
     int window_w, window_h;
     glfwGetFramebufferSize(window, &window_w, &window_h);
 
-    glm::mat4 view_matrix = glm::lookAt(glm::vec3(player_position), glm::vec3(player_position) + look, up);
+    glm::mat4 view_matrix = glm::lookAt(player_position, player_position + look, up);
     glm::mat4 projection_matrix = glm::perspective(
         glm::radians(80.f),
         ((float)window_w)/window_h,
@@ -70,31 +70,56 @@ void Game::update() {
     );
 
     const glm::vec3 tangent = glm::cross(-look, up);
-    glm::vec4 forward_step = (glm::vec4(look, 0) * forward_direction * movement_speed * (float)moving_forward);
-    glm::vec4 side_step = (glm::vec4(tangent, 0) * movement_speed * sideways_direction* (float)moving_sideways);
-    glm::vec4 gravity = glm::vec4(up, 0) * -movement_speed * (float)gravity_switch;
+    bool any_key = false;
+    if (key_pressed[GLFW_KEY_W]) {
+        applyInputAccel(look * acceleration);
+        any_key = true;
+    }
+    if (key_pressed[GLFW_KEY_S]) {
+        applyInputAccel(look * (-acceleration));
+        any_key = true;
+    }
+    if (key_pressed[GLFW_KEY_D]) {
+        applyInputAccel(tangent * (-acceleration));
+        any_key = true;
+    }
+    if (key_pressed[GLFW_KEY_A]) {
+        applyInputAccel(tangent * acceleration);
+        any_key = true;
+    } 
+    if (!any_key) {
+        player_motion *= 0.8;
+    }
 
-    glm::vec4 movement = forward_step +  side_step + gravity;
-    int steps = glm::length(movement) * 1000;
-    glm::vec4 step = glm::vec4(glm::vec3(movement) / (float)steps, 0);
+    if (gravity_switch) {
+        player_velocity += (-up) * gravity;
+    }
+
+    glm::vec3 movement = player_motion + player_velocity;
+    int steps = 1; //glm::length(movement) * 50;
+    glm::vec3 step = movement / (float)steps;
+    std::cout << steps << std::endl;
+
+    auto collides = [&](const glm::ivec3& pos) {
+        return grid[pos.x][pos.y][pos.z].solid;
+    };
 
     for (int i = 0; i < steps; ++i) {
-        glm::ivec3 grid_pos_feet = gridWorld(step + player_position + glm::vec4(0,-1,0,0));
-        glm::ivec3 grid_pos = gridWorld(step + player_position);
-        glm::ivec3 old_grid_pos = gridWorld(player_position);
+        const glm::ivec3 grid_pos_feet = gridWorld(step + player_position + glm::vec3(0,-1,0));
+        const glm::ivec3 grid_pos = gridWorld(step + player_position);
+        const glm::ivec3 old_grid_pos = gridWorld(player_position);
 
-        if (grid[grid_pos.x][grid_pos.y][grid_pos.z].solid || 
-            grid[grid_pos_feet.x][grid_pos_feet.y][grid_pos_feet.z].solid) {
+        if (collides(grid_pos) || collides(grid_pos_feet)) {
             if (grid_pos != old_grid_pos) {
                 // moved
-                glm::vec3 normal_component = glm::proj(glm::vec3(step), glm::normalize(glm::vec3(old_grid_pos-grid_pos)));
-                std::cout << glm::to_string(glm::vec3(old_grid_pos-grid_pos));
-                std::cout << glm::to_string(glm::vec3(step)) << std::endl;
-                step = step - glm::vec4(normal_component, 0);
+                const glm::vec3 hit_normal = glm::normalize(glm::vec3(old_grid_pos - grid_pos));
+                std::cout << "hn " << glm::to_string(hit_normal) << std::endl;
+                step -= glm::proj(step, hit_normal);
+                player_velocity -= glm::proj(player_velocity, hit_normal);
             } else {
                 // already in block
                 std::cout << "FUCK" << std::endl;
-                exit(0);
+                // exit(0);
                 // glm::vec3 dx = glm::vec3(player_position) - (glm::vec3(grid_pos) + glm::vec3(0.5));
                 // player_position += glm::vec4(dx, 0);
             }
@@ -165,6 +190,12 @@ void Game::updateOrientation() {
 	look = glm::vec3(rotation * glm::vec4(look, 0.));
 }
 
- glm::ivec3 Game::gridWorld(const glm::vec3& pos) {
-     return glm::ivec3((int)floor(pos.x), (int)floor(pos.y), (int)floor(pos.z));
- }
+glm::ivec3 Game::gridWorld(const glm::vec3& pos) {
+    return glm::ivec3((int)floor(pos.x), (int)floor(pos.y), (int)floor(pos.z));
+}
+
+void Game::applyInputAccel(const glm::vec3& acc) {
+    const glm::vec3 new_vel = player_motion + acc;
+    const float new_speed = std::min(max_speed, glm::length(new_vel));
+    player_motion = glm::normalize(new_vel) * new_speed;
+}

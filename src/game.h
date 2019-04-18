@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -22,20 +24,22 @@ struct Game {
     void updateOrientation();
     bool intersectWorld(const glm::vec4& new_position);
     glm::ivec3 gridWorld(const glm::vec3& pos);
+    void applyInputAccel(const glm::vec3& acc);
 
 //  Window, mouse, keyboard attributes
     GLFWwindow* window;
+    std::unordered_map<int, bool> key_pressed;
     BlockGrid grid;
     glm::vec2 mouse_position = glm::vec2(-1,-1);
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
-    bool moving_forward = false;
-    bool moving_sideways = false;
     bool gravity_switch = false;
-    float forward_direction = 1;
-    float sideways_direction = 1;
-    float movement_speed = 0.2;
+    float acceleration = 0.025;
+    float gravity = 0.05;
+    float max_speed = 0.2;
     float mouse_speed = 0.003;
-    glm::vec4 player_position = glm::vec4(38,28,45,1);
+    glm::vec3 player_position = glm::vec3(38,28,45);
+    glm::vec3 player_velocity = glm::vec3(0,0,0);
+    glm::vec3 player_motion = glm::vec3(0,0,0);
     glm::vec3 look = glm::vec3(0,0,1);
     glm::vec3 up = glm::vec3(0,1,0);
 
