@@ -42,7 +42,7 @@ struct World {
         return chunk_store[chunk_pos];
     }
 
-    void load_nearby(glm::vec3 pos, int range = 2) {
+    void load_nearby(glm::vec3 pos, int range = 1) {
         int x0 = (int)(pos.x / chunk_size) - range;
         int x1 = x0 + range * 2;
         int z0 = (int)(pos.z / chunk_size) - range;
@@ -55,17 +55,33 @@ struct World {
         }
     }
 
+    void unload_far(glm::vec3 pos, int far = 3) {
+        int x0 = (int)(pos.x / chunk_size) - far;
+        int x1 = x0 + far * 2;
+        int z0 = (int)(pos.z / chunk_size) - far;
+        int z1 = z0 + far * 2;
+
+        auto it = chunk_store.begin();
+        while (it != chunk_store.end()) {
+            const glm::ivec2& chunk_pos = it->first;
+            if (chunk_pos.x < x0 || chunk_pos.y < z0 || chunk_pos.x > x1 || chunk_pos.y > z1) {
+                it = chunk_store.erase(it);
+            }
+            ++it;
+        }
+    }
+
     void load_chunk(glm::ivec2 chunk_pos) {
         if (!has_chunk(chunk_pos)) {
-            std::cout << "loading chunk " << glm::to_string(chunk_pos) << std::endl;
             chunk_store[chunk_pos] = gen_chunk(chunk_pos);
-            update_cubes_instances();
+            cubes_dirty = true;
         }
     }
 
     void free_chunk(glm::ivec2 chunk_pos) {
         std::cout << "freeing chunk " << glm::to_string(chunk_pos) << std::endl;
         chunk_store.erase(chunk_pos);
+        cubes_dirty = true;
     }
 
     bool has_chunk(glm::ivec2 chunk_pos) {
@@ -97,6 +113,7 @@ struct World {
     }
 
     void update_cubes_instances() {
+        if (!cubes_dirty) { return; }
         std::vector<Cubes::Instance> cube_instances;
         std::vector<Cubes::Instance> water_instances;
 
@@ -124,8 +141,10 @@ struct World {
         
         cubes.vao.instances.set_data(cube_instances);
         water_cubes.vao.instances.set_data(water_instances);
+        cubes_dirty = false;
     }
 
+    bool cubes_dirty = true;
     Cubes& cubes, water_cubes;
     std::unordered_map<glm::ivec2, Chunk> chunk_store;
 };

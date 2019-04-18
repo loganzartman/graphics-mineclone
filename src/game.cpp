@@ -34,6 +34,10 @@ void Game::update() {
     int window_w, window_h;
     glfwGetFramebufferSize(window, &window_w, &window_h);
 
+    world.load_nearby(player_position);
+    world.unload_far(player_position);
+    world.update_cubes_instances();
+
     const glm::vec3 camera_position = player_position + glm::vec3(0, 0.5, 0);
     glm::mat4 view_matrix = glm::lookAt(camera_position, camera_position + look, up);
     glm::mat4 projection_matrix = glm::perspective(
