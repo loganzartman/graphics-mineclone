@@ -70,7 +70,7 @@ public:
 
     GLint uniform_loc(std::string uname) {
         GLint location = glGetUniformLocation(id, uname.c_str());
-        if (location < 0) { std::cerr << "Warning in " << name << ": invalid or unused uniform: " << uname << std::endl; }
+        // if (location < 0) { std::cerr << "Warning in " << name << ": invalid or unused uniform: " << uname << std::endl; }
         return location;
     }
     
