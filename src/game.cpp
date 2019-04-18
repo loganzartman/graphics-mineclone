@@ -21,8 +21,7 @@
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
     water_program.vertex({"cube.vs"}).fragment({"water.fs"}).geometry({"cube.gs"}).compile();
-    background_tex.set_texture_size(window);
-    render_tex.set_texture_size(window);
+    handleResize();
     std::default_random_engine generator;
     std::uniform_int_distribution<int> height(1,3);
     std::vector<Cubes::Instance> cube_instances;
@@ -56,6 +55,11 @@ void Game::init() {
 
     cubes.vao.instances.set_data(cube_instances);
     water_cubes.vao.instances.set_data(water_instances);
+}
+
+void Game::handleResize() {
+    background_tex.set_texture_size(window);
+    render_tex.set_texture_size(window);
 }
 
 void Game::update() {

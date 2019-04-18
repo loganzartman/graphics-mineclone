@@ -20,6 +20,7 @@ struct Game {
         grid(BlockGrid(world_size, std::vector<std::vector<Block>>(world_size, std::vector<Block>(world_size))))
         {}
     void init();
+    void handleResize();
     void update();
     void updateOrientation();
     bool intersectWorld(const glm::vec4& new_position);

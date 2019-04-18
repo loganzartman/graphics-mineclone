@@ -67,6 +67,11 @@ MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
+void FramebufferSizeCallback(GLFWwindow* window, int w, int h) {
+    Game* game = (Game*)glfwGetWindowUserPointer(window);
+    game->handleResize();
+}
+
 int main() {
     // setup glfw
     glfwSetErrorCallback(glfw_error_callback);
@@ -86,6 +91,7 @@ int main() {
     glfwSetKeyCallback(window, KeyCallback);
 	glfwSetCursorPosCallback(window, MousePosCallback);
 	glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     mouse_locked = true;
 
