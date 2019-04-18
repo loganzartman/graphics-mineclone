@@ -38,7 +38,7 @@ void Game::init() {
                     grid[x][y][z].type
                 ));
             }
-            for (int y = h; y <= 12; ++y) {
+            for (int y = h+1; y <= 12; ++y) {
                 grid[x][y][z] = Block(false, 4);
                 water_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
