@@ -42,7 +42,7 @@ struct World {
         return chunk_store[chunk_pos];
     }
 
-    void load_nearby(glm::vec3 pos, int range = 0) {
+    void load_nearby(glm::vec3 pos, int range = 1) {
         int x0 = (int)(pos.x / chunk_size) - range;
         int x1 = x0 + range * 2;
         int z0 = (int)(pos.z / chunk_size) - range;
@@ -55,7 +55,7 @@ struct World {
         }
     }
 
-    void unload_far(glm::vec3 pos, int far = 3) {
+    void unload_far(glm::vec3 pos, int far = 2) {
         int x0 = (int)(pos.x / chunk_size) - far;
         int x1 = x0 + far * 2;
         int z0 = (int)(pos.z / chunk_size) - far;
