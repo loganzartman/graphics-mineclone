@@ -11,6 +11,8 @@
 
 #include "game.h"
 
+bool mouse_locked = false;
+
 /**
  * Called in the event that any GLFW function fails.
  */
@@ -29,8 +31,12 @@ KeyCallback(GLFWwindow* window,
 {
     Game* game = (Game*)glfwGetWindowUserPointer(window);
 
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        if (mouse_locked) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            mouse_locked = false;
+        }
+    }
 
     if (key == GLFW_KEY_F && mods == GLFW_MOD_CONTROL && action == GLFW_PRESS) {
         game->gravity_switch = !game->gravity_switch;
@@ -55,7 +61,10 @@ MousePosCallback(GLFWwindow* window, double mouse_x, double mouse_y)
 void
 MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	return;
+    if (!mouse_locked) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        mouse_locked = true;
+    }
 }
 
 int main() {
@@ -78,6 +87,7 @@ int main() {
 	glfwSetCursorPosCallback(window, MousePosCallback);
 	glfwSetMouseButtonCallback(window, MouseButtonCallback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    mouse_locked = true;
 
     std::cout << "Window creation successful." << std::endl;
 
