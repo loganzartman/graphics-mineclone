@@ -112,9 +112,9 @@ void Game::update() {
     }
 
     glm::vec3 movement = player_motion + player_velocity;
-    int steps = 100; //glm::length(movement) * 50;
+    int steps = glm::length(movement) * 500;
     glm::vec3 step = movement / (float)steps;
-    std::cout << steps << std::endl;
+    // std::cout << steps << std::endl;
 
     auto collides = [&](const glm::ivec3& pos) {
         return grid[pos.x][pos.y][pos.z].solid;
@@ -145,8 +145,7 @@ void Game::update() {
                     player_velocity -= glm::proj(player_velocity, hit_normal);
                 } else {
                     // already in block
-                    std::cout << "FUCK" << std::endl;
-                    // exit(0);
+                    // std::cout << "resolving collision" << std::endl;
                     glm::vec3 dx = player_position - (glm::vec3(grid_pos) + glm::vec3(0.5));
                     player_position += dx;
                 }
@@ -154,6 +153,8 @@ void Game::update() {
             player_position += dstep;
         }
     }
+
+    player_velocity *= 0.98;
 
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.f,0.f,0.f,1.0f);

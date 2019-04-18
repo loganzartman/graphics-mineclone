@@ -36,6 +36,9 @@ KeyCallback(GLFWwindow* window,
         game->gravity_switch = !game->gravity_switch;
     }
 
+    if (key == GLFW_KEY_LEFT_SHIFT && action == GLFW_PRESS)
+        game->player_velocity += game->look * 5.f;
+
     if (action == GLFW_PRESS)
         game->key_pressed[key] = true;
     if (action == GLFW_RELEASE)
