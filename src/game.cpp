@@ -17,6 +17,7 @@
 #include "gfx/vao.h"
 #include "cubes.h"
 #include "noise.h"
+#include "world.h"
 
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
@@ -26,23 +27,24 @@ void Game::init() {
     std::uniform_int_distribution<int> height(1,3);
     std::vector<Cubes::Instance> cube_instances;
     std::vector<Cubes::Instance> water_instances;
-    for (int x = 0; x < 200; ++x) {
-        for (int z = 0; z < 200; ++z) {
-            float f = noise::perlin3d({x * 0.02, 0, z * 0.02}, 3, 0.5);
-            int h = (int)(f * 20) + 20;
-            for (int y = h - 1; y <= h; ++y) { 
-                grid[x][y][z] = Block(true, (f < 0 ? 1 : f < 0.1 ? 2 : 3));
-                cube_instances.emplace_back(Cubes::Instance(
-                    glm::vec3(x, y, z),
-                    grid[x][y][z].type
-                ));
-            }
-            for (int y = h+1; y <= 12; ++y) {
-                grid[x][y][z] = Block(false, 4);
-                water_instances.emplace_back(Cubes::Instance(
-                    glm::vec3(x, y, z),
-                    grid[x][y][z].type
-                ));
+    
+    World world;
+    Chunk chunk = world.gen_chunk({0,0});
+    for (int x = 0; x < chunk_size; ++x) {
+        for (int y = 0; y < chunk_size; ++y) {
+            for (int z = 0; z < chunk_size; ++z) {
+                Block b = chunk[x][y][z];
+                if (b.type == 4) {
+                    water_instances.emplace_back(Cubes::Instance(
+                        glm::vec3(x, y, z),
+                        b.type
+                    ));
+                } else if (b.type != 0) {
+                    cube_instances.emplace_back(Cubes::Instance(
+                        glm::vec3(x, y, z),
+                        b.type
+                    ));
+                }
             }
         }
     }

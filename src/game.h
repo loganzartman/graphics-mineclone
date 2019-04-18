@@ -15,7 +15,7 @@
 using BlockGrid = std::vector<std::vector<std::vector<Block>>>;
 
 struct Game {
-    constexpr static int world_size = 200;
+    constexpr static int world_size = 64;
     Game(GLFWwindow* window) : window(window),
         grid(BlockGrid(world_size, std::vector<std::vector<Block>>(world_size, std::vector<Block>(world_size))))
         {}
