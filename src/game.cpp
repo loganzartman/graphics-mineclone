@@ -8,6 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/projection.hpp>
 #include <iostream>
 #include "game.h"
 #include "gfx/program.h"
@@ -32,14 +34,14 @@ void Game::init() {
                 grid[x][y][z] = Block(true, (f < 0 ? 1 : f < 0.1 ? 2 : 3));
                 cube_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
-                    (f < 0 ? 1 : f < 0.1 ? 2 : 3)
+                    grid[x][y][z].type
                 ));
             }
             for (int y = h; y <= 12; ++y) {
                 grid[x][y][z] = Block(false, 4);
                 water_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
-                    4
+                    grid[x][y][z].type
                 ));
             }
         }
@@ -61,18 +63,24 @@ void Game::update() {
         1000.f
     );
 
-    if(moving_forward || moving_sideways) {
-        const glm::vec3 tangent = glm::cross(-look, up);
-        glm::vec4 forward_step = (glm::vec4(look, 0) * forward_direction * movement_speed );
-        glm::vec4 side_step = (glm::vec4(tangent, 0) * movement_speed * sideways_direction);
-        glm::vec4 new_position = player_position + ((float)moving_forward * forward_step + (float)moving_sideways * side_step);
-        // if(grid[(int)floor(new_position.x)][(int)floor(new_position.y)][(int)floor(new_position.z)].solid) {
-        //     new_position = player_position;
-        // }
-        player_position = new_position;
-    
-    }
+    const glm::vec3 tangent = glm::cross(-look, up);
+    glm::vec4 forward_step = (glm::vec4(look, 0) * forward_direction * movement_speed * (float)moving_forward);
+    glm::vec4 side_step = (glm::vec4(tangent, 0) * movement_speed * sideways_direction* (float)moving_sideways);
+    glm::vec4 gravity = glm::vec4(up, 0) * -movement_speed * (float)gravity_switch;
 
+    glm::vec4 step = forward_step +  side_step + gravity;
+    
+    glm::ivec3 grid_pos = gridWorld(step + player_position);
+    glm::ivec3 old_grid_pos = gridWorld(player_position);
+
+    if (grid[grid_pos.x][grid_pos.y][grid_pos.z].solid) {
+        if (grid_pos != old_grid_pos) {
+            glm::vec3 normal_component = glm::proj(glm::vec3(step), glm::normalize(glm::vec3(old_grid_pos-grid_pos)));
+            step = step - glm::vec4(normal_component, 0);
+        }
+        
+    }
+    player_position += step;
 
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.f,0.f,0.f,1.0f);
@@ -131,3 +139,6 @@ void Game::updateOrientation() {
 	look = glm::vec3(rotation * glm::vec4(look, 0.));
 }
 
+ glm::ivec3 Game::gridWorld(const glm::vec3& pos) {
+     return glm::ivec3((int)floor(pos.x), (int)floor(pos.y) - 1, (int)floor(pos.z));
+ }

@@ -20,6 +20,8 @@ struct Game {
     void init();
     void update();
     void updateOrientation();
+    bool intersectWorld(const glm::vec4& new_position);
+    glm::ivec3 gridWorld(const glm::vec3& pos);
 
 //  Window, mouse, keyboard attributes
     GLFWwindow* window;
@@ -28,11 +30,12 @@ struct Game {
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
     bool moving_forward = false;
     bool moving_sideways = false;
+    bool gravity_switch = false;
     float forward_direction = 1;
     float sideways_direction = 1;
-    float movement_speed = 0.5;
+    float movement_speed = 0.2;
     float mouse_speed = 0.003;
-    glm::vec4 player_position = glm::vec4(0,7,0,1);
+    glm::vec4 player_position = glm::vec4(38,28,45,1);
     glm::vec3 look = glm::vec3(0,0,1);
     glm::vec3 up = glm::vec3(0,1,0);
 

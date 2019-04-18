@@ -56,7 +56,10 @@ KeyCallback(GLFWwindow* window,
         game->moving_sideways = true;
         game->sideways_direction = -1;
     }
-               // eye_ = eye_  + look_ * zoom_speed * direction;
+
+    if (key == GLFW_KEY_F && mods == GLFW_MOD_CONTROL && action == GLFW_RELEASE) {
+        game->gravity_switch = !game->gravity_switch;
+    }
 }
 
 void
