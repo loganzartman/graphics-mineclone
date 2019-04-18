@@ -42,7 +42,7 @@ struct World {
         return chunk_store[chunk_pos];
     }
 
-    void load_nearby(glm::vec3 pos, int range = 1) {
+    void load_nearby(glm::vec3 pos, int range = 0) {
         int x0 = (int)(pos.x / chunk_size) - range;
         int x1 = x0 + range * 2;
         int z0 = (int)(pos.z / chunk_size) - range;
@@ -66,8 +66,9 @@ struct World {
             const glm::ivec2& chunk_pos = it->first;
             if (chunk_pos.x < x0 || chunk_pos.y < z0 || chunk_pos.x > x1 || chunk_pos.y > z1) {
                 it = chunk_store.erase(it);
+            } else {
+                ++it;
             }
-            ++it;
         }
     }
 
