@@ -20,23 +20,23 @@ void Game::init() {
     water_program.vertex({"cube.vs"}).fragment({"water.fs"}).geometry({"cube.gs"}).compile();
     background_tex.set_texture_size(window);
     render_tex.set_texture_size(window);
-    
     std::default_random_engine generator;
     std::uniform_int_distribution<int> height(1,3);
-
     std::vector<Cubes::Instance> cube_instances;
     std::vector<Cubes::Instance> water_instances;
-    for (int x = -100; x <= 100; ++x) {
-        for (int z = -100; z <= 100; ++z) {
+    for (int x = 0; x < 200; ++x) {
+        for (int z = 0; z < 200; ++z) {
             float f = noise::perlin3d({x * 0.02, 0, z * 0.02}, 3, 0.5);
-            int h = (int)(f * 20);
+            int h = (int)(f * 20) + 20;
             for (int y = h - 1; y <= h; ++y) { 
+                grid[x][y][z] = Block(true, (f < 0 ? 1 : f < 0.1 ? 2 : 3));
                 cube_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
                     (f < 0 ? 1 : f < 0.1 ? 2 : 3)
                 ));
             }
-            for (int y = h; y <= -5; ++y) {
+            for (int y = h; y <= 12; ++y) {
+                grid[x][y][z] = Block(false, 4);
                 water_instances.emplace_back(Cubes::Instance(
                     glm::vec3(x, y, z),
                     4
@@ -61,14 +61,18 @@ void Game::update() {
         1000.f
     );
 
-    if(moving_forward) {
-        player_position += (glm::vec4(look, 0) * forward_direction * movement_speed ); 
+    if(moving_forward || moving_sideways) {
+        const glm::vec3 tangent = glm::cross(-look, up);
+        glm::vec4 forward_step = (glm::vec4(look, 0) * forward_direction * movement_speed );
+        glm::vec4 side_step = (glm::vec4(tangent, 0) * movement_speed * sideways_direction);
+        glm::vec4 new_position = player_position + ((float)moving_forward * forward_step + (float)moving_sideways * side_step);
+        // if(grid[(int)floor(new_position.x)][(int)floor(new_position.y)][(int)floor(new_position.z)].solid) {
+        //     new_position = player_position;
+        // }
+        player_position = new_position;
+    
     }
 
-    if(moving_sideways) {
-        const glm::vec3 tangent = glm::cross(-look, up);
-	    player_position +=  (glm::vec4(tangent, 0) * movement_speed * sideways_direction);
-    }
 
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.f,0.f,0.f,1.0f);

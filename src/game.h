@@ -7,16 +7,23 @@
 #include "gfx/vao.h"
 #include "gfx/rendertexture.h"
 #include "cubes.h"
+#include "block.h"
 #include "texquad.h"
 
+using BlockGrid = std::vector<std::vector<std::vector<Block>>>;
+
 struct Game {
-    Game(GLFWwindow* window) : window(window) {};
+    constexpr static int world_size = 200;
+    Game(GLFWwindow* window) : window(window),
+        grid(BlockGrid(world_size, std::vector<std::vector<Block>>(world_size, std::vector<Block>(world_size))))
+        {}
     void init();
     void update();
     void updateOrientation();
 
 //  Window, mouse, keyboard attributes
     GLFWwindow* window;
+    BlockGrid grid;
     glm::vec2 mouse_position = glm::vec2(-1,-1);
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
     bool moving_forward = false;
