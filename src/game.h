@@ -33,6 +33,7 @@ struct Game {
     glm::vec2 mouse_position = glm::vec2(-1,-1);
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
     bool gravity_switch = false;
+    bool on_ground = false;
     float acceleration = 0.025;
     float gravity = 0.05;
     float max_speed = 0.2;

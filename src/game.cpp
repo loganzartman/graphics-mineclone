@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <cmath>
+#include <array>
 
 #include <glad/glad.h>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -69,6 +70,11 @@ void Game::update() {
         1000.f
     );
 
+    if (key_pressed[GLFW_KEY_SPACE] && on_ground) {
+        player_velocity += glm::vec3(0, 1, 0);
+        on_ground = false;
+    }
+
     const glm::vec3 tangent = glm::cross(-look, up);
     bool any_key = false;
     if (key_pressed[GLFW_KEY_W]) {
@@ -96,7 +102,7 @@ void Game::update() {
     }
 
     glm::vec3 movement = player_motion + player_velocity;
-    int steps = 1; //glm::length(movement) * 50;
+    int steps = 100; //glm::length(movement) * 50;
     glm::vec3 step = movement / (float)steps;
     std::cout << steps << std::endl;
 
@@ -104,27 +110,39 @@ void Game::update() {
         return grid[pos.x][pos.y][pos.z].solid;
     };
 
-    for (int i = 0; i < steps; ++i) {
-        const glm::ivec3 grid_pos_feet = gridWorld(step + player_position + glm::vec3(0,-1,0));
-        const glm::ivec3 grid_pos = gridWorld(step + player_position);
-        const glm::ivec3 old_grid_pos = gridWorld(player_position);
+    const std::array<glm::vec3, 3> directions{
+        glm::vec3(1, 0, 0),
+        glm::vec3(0, 1, 0),
+        glm::vec3(0, 0, 1)
+    };
 
-        if (collides(grid_pos) || collides(grid_pos_feet)) {
-            if (grid_pos != old_grid_pos) {
-                // moved
-                const glm::vec3 hit_normal = glm::normalize(glm::vec3(old_grid_pos - grid_pos));
-                std::cout << "hn " << glm::to_string(hit_normal) << std::endl;
-                step -= glm::proj(step, hit_normal);
-                player_velocity -= glm::proj(player_velocity, hit_normal);
-            } else {
-                // already in block
-                std::cout << "FUCK" << std::endl;
-                // exit(0);
-                // glm::vec3 dx = glm::vec3(player_position) - (glm::vec3(grid_pos) + glm::vec3(0.5));
-                // player_position += glm::vec4(dx, 0);
+    for (int i = 0; i < steps; ++i) {
+        const glm::ivec3 old_grid_pos = gridWorld(player_position);
+        for (const glm::vec3& dir : directions) {
+            glm::vec3 dstep = dir * step;
+            const glm::ivec3 grid_pos_feet = gridWorld(dstep + player_position + glm::vec3(0,-1,0));
+            const glm::ivec3 grid_pos = gridWorld(dstep + player_position);
+
+            if (collides(grid_pos) || collides(grid_pos_feet)) {
+                if (grid_pos != old_grid_pos) {
+                    // moved
+                    const glm::vec3 hit_normal = glm::normalize(glm::vec3(old_grid_pos - grid_pos));
+                    if (hit_normal.y > 0.9) {
+                        on_ground = true;
+                    }
+                    step -= glm::proj(step, hit_normal);
+                    dstep -= glm::proj(dstep, hit_normal);
+                    player_velocity -= glm::proj(player_velocity, hit_normal);
+                } else {
+                    // already in block
+                    std::cout << "FUCK" << std::endl;
+                    // exit(0);
+                    glm::vec3 dx = player_position - (glm::vec3(grid_pos) + glm::vec3(0.5));
+                    player_position += dx;
+                }
             }
+            player_position += dstep;
         }
-        player_position += step;
     }
 
     glViewport(0, 0, window_w, window_h);
