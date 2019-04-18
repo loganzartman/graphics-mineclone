@@ -146,6 +146,7 @@ struct World {
     }
 
     bool cubes_dirty = true;
-    Cubes& cubes, water_cubes;
+    Cubes& cubes;
+    Cubes& water_cubes;
     std::unordered_map<glm::ivec2, Chunk> chunk_store;
 };
