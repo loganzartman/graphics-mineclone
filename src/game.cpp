@@ -23,40 +23,6 @@ void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
     water_program.vertex({"cube.vs"}).fragment({"water.fs"}).geometry({"cube.gs"}).compile();
     handleResize();
-    std::default_random_engine generator;
-    std::uniform_int_distribution<int> height(1,3);
-    std::vector<Cubes::Instance> cube_instances;
-    std::vector<Cubes::Instance> water_instances;
-    
-    World world;
-    Chunk chunk = world.gen_chunk({0,0});
-    for (int x = 0; x < chunk_size; ++x) {
-        for (int y = 0; y < chunk_size; ++y) {
-            for (int z = 0; z < chunk_size; ++z) {
-                Block b = chunk[x][y][z];
-                if (b.type == 4) {
-                    water_instances.emplace_back(Cubes::Instance(
-                        glm::vec3(x, y, z),
-                        b.type
-                    ));
-                } else if (b.type != 0) {
-                    cube_instances.emplace_back(Cubes::Instance(
-                        glm::vec3(x, y, z),
-                        b.type
-                    ));
-                }
-            }
-        }
-    }
-
-    grid[20][40][20] = Block(true, 0);
-    cube_instances.emplace_back(Cubes::Instance(
-        glm::vec3(20, 40, 20),
-        0
-    ));
-
-    cubes.vao.instances.set_data(cube_instances);
-    water_cubes.vao.instances.set_data(water_instances);
 }
 
 void Game::handleResize() {
@@ -122,10 +88,6 @@ void Game::update() {
     glm::vec3 step = movement / (float)steps;
     // std::cout << steps << std::endl;
 
-    auto collides = [&](const glm::ivec3& pos) {
-        return grid[pos.x][pos.y][pos.z].solid;
-    };
-
     const std::array<glm::vec3, 3> directions{
         glm::vec3(1, 0, 0),
         glm::vec3(0, 1, 0),
@@ -139,7 +101,7 @@ void Game::update() {
             const glm::ivec3 grid_pos_feet = gridWorld(dstep + player_position + glm::vec3(0,-1,0));
             const glm::ivec3 grid_pos = gridWorld(dstep + player_position);
 
-            if (collides(grid_pos) || collides(grid_pos_feet)) {
+            if (world.is_solid(grid_pos) || world.is_solid(grid_pos_feet)) {
                 if (grid_pos != old_grid_pos) {
                     // moved
                     const glm::vec3 hit_normal = glm::normalize(glm::vec3(old_grid_pos - grid_pos));

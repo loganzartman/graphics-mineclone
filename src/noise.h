@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 namespace noise {
-uint hash(uint a) {
+static uint hash(uint a) {
     a = (a+0x7ed55d16) + (a<<12);
     a = (a^0xc761c23c) ^ (a>>19);
     a = (a+0x165667b1) + (a<<5);

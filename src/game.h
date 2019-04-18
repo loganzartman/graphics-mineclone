@@ -11,14 +11,10 @@
 #include "cubes.h"
 #include "block.h"
 #include "texquad.h"
-
-using BlockGrid = std::vector<std::vector<std::vector<Block>>>;
+#include "world.h"
 
 struct Game {
-    constexpr static int world_size = 64;
-    Game(GLFWwindow* window) : window(window),
-        grid(BlockGrid(world_size, std::vector<std::vector<Block>>(world_size, std::vector<Block>(world_size))))
-        {}
+    Game(GLFWwindow* window) : window(window) {}
     void init();
     void handleResize();
     void update();
@@ -30,7 +26,6 @@ struct Game {
 //  Window, mouse, keyboard attributes
     GLFWwindow* window;
     std::unordered_map<int, bool> key_pressed;
-    BlockGrid grid;
     glm::vec2 mouse_position = glm::vec2(-1,-1);
     glm::vec2 mouse_prev = glm::vec2(-1,-1);
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
@@ -54,4 +49,6 @@ struct Game {
     gfx::RenderTexture background_tex;
     gfx::RenderTexture render_tex;
     TexQuad display_quad;
+
+    World world = World(cubes, water_cubes);
 };
