@@ -62,7 +62,8 @@ void Game::update() {
     int window_w, window_h;
     glfwGetFramebufferSize(window, &window_w, &window_h);
 
-    glm::mat4 view_matrix = glm::lookAt(player_position, player_position + look, up);
+    const glm::vec3 camera_position = player_position + glm::vec3(0, 0.5, 0);
+    glm::mat4 view_matrix = glm::lookAt(camera_position, camera_position + look, up);
     glm::mat4 projection_matrix = glm::perspective(
         glm::radians(80.f),
         ((float)window_w)/window_h,
