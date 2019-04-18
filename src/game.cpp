@@ -219,7 +219,7 @@ void Game::updateOrientation() {
 }
 
 glm::ivec3 Game::gridWorld(const glm::vec3& pos) {
-    return glm::ivec3((int)floor(pos.x), (int)floor(pos.y), (int)floor(pos.z));
+    return glm::ivec3((int)(pos.x), (int)(pos.y), (int)(pos.z));
 }
 
 void Game::applyInputAccel(const glm::vec3& acc) {
