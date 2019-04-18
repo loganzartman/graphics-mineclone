@@ -77,9 +77,10 @@ struct World {
         Chunk chunk;
         for (int x = 0; x < chunk_size; ++x) {
             for (int z = 0; z < chunk_size; ++z) {
-                glm::vec3 perlin_pos = glm::vec3(x * 0.02, 0, z * 0.02);
+                glm::vec3 perlin_pos = glm::vec3(x, 0, z);
                 perlin_pos.x += chunk_pos.x * chunk_size;
                 perlin_pos.z += chunk_pos.y * chunk_size;
+                perlin_pos *= 0.02f;
                 float f = noise::perlin3d(perlin_pos, 3, 0.5);
                 int h = (int)(f * 20) + 20;
                 
