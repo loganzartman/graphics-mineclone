@@ -46,15 +46,7 @@ void
 MousePosCallback(GLFWwindow* window, double mouse_x, double mouse_y)
 {   
     Game* game = (Game*)glfwGetWindowUserPointer(window);
-    bool first = game->mouse_position == glm::vec2(-1,-1);
-    float dx = mouse_x - game->mouse_position.x;
-    float dy = mouse_y - game->mouse_position.y;
     game->mouse_position = glm::vec2(mouse_x, mouse_y);
-    game->mouse_pos_vector = -glm::vec2(dx,dy);
-    if (first) return;
-
-    game->updateOrientation();
-
 }
 
 void

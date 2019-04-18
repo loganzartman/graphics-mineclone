@@ -70,6 +70,15 @@ void Game::update() {
         1000.f
     );
 
+    bool first = mouse_prev == glm::vec2(-1,-1);
+    if (first) {
+        mouse_prev = mouse_position;
+    } else {
+        mouse_pos_vector = -(mouse_position - mouse_prev);
+        updateOrientation();
+        mouse_prev = mouse_position;
+    }
+
     if (key_pressed[GLFW_KEY_SPACE] && on_ground) {
         player_velocity += glm::vec3(0, 1, 0);
         on_ground = false;

@@ -31,6 +31,7 @@ struct Game {
     std::unordered_map<int, bool> key_pressed;
     BlockGrid grid;
     glm::vec2 mouse_position = glm::vec2(-1,-1);
+    glm::vec2 mouse_prev = glm::vec2(-1,-1);
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
     bool gravity_switch = false;
     bool on_ground = false;
