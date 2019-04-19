@@ -174,6 +174,7 @@ void Game::updateOrientation() {
     if (glm::length(mouse_pos_vector) == 0) {
 		return;}
 	mouse_pos_vector.x *= -1.f;
+    mouse_pos_vector *= mouse_speed;
     yaw += mouse_pos_vector.x;
     yaw = fmod(yaw, 360);
 
