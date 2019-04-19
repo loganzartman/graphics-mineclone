@@ -47,13 +47,13 @@ struct World {
     }
 
     Block get_block(glm::vec2 pos) {
-        return get_block(glm::trunc(pos)); 
+        return get_block(glm::floor(pos)); 
     }
 
     Block get_block(glm::ivec3 block_pos) {
-        glm::ivec2 chunk_pos = glm::ivec2(block_pos.x, block_pos.z) / chunk_size;
+        glm::ivec2 chunk_pos = glm::floor(glm::vec2(block_pos.x, block_pos.z) / (float)chunk_size);
         Chunk& chunk = get_chunk(chunk_pos);
-        glm::ivec3 local_pos = glm::ivec3(block_pos.x % chunk_size, block_pos.y, block_pos.z % chunk_size);
+        glm::ivec3 local_pos = glm::ivec3(glm::mod((float)block_pos.x, (float)chunk_size), block_pos.y, glm::mod((float)block_pos.z, (float)chunk_size));
         if (!chunk.in_bounds(local_pos)) {
             return Block();
         }
