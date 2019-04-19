@@ -21,6 +21,20 @@ float depth_to_ndc(float d) {
     return z_e;
 }
 
+vec3 project(vec3 v, vec3 onto) {
+    float len_onto = length(onto);
+    return dot(onto, v) / (len_onto * len_onto) * onto;
+}
+
+vec3 fake_refract(vec3 I, vec3 N, float eta) {
+    float k = 1.0 - eta * eta * (1.0 - dot(N, I) * dot(N, I));
+    if (k < 0.0) {
+        // the fake part: just force the refraction to work
+        k = 0;
+    }
+    return eta * I - (eta * dot(N, I) + sqrt(k)) * N;
+}
+
 void main() {
     // compute a fake normal
     const float epsilon = 0.001;
@@ -39,8 +53,11 @@ void main() {
     float d_foreground_cam = gl_FragCoord.z / gl_FragCoord.w;
     float d_total = d_background_cam - d_foreground_cam;
 
-    // transmissive
-    vec3 color = texture(background, gl_FragCoord.xy / resolution).rgb;
+    // transmissive with super fake refractions
+    vec3 refracted_dir = normalize(fake_refract(ray_direction, frag_normal, 1.33));
+    vec3 refracted_ray = refracted_dir * d_total;
+    vec3 refraction_offset = refracted_ray - project(refracted_ray, ray_direction);
+    vec3 color = texture(background, gl_FragCoord.xy / resolution + refraction_offset.xz * 0.03).rgb;
     float f = clamp(d_total / 5., 0.5, 1);
     float f2 = clamp(d_total / 10., 0, 1);
     vec3 water_color = vec3(0.1, 0.5, 0.8);
@@ -50,7 +67,7 @@ void main() {
     // specular
     vec3 reflected_dir = reflect(vec3(light_direction), frag_normal);
     float f_specular = max(dot(ray_direction, reflected_dir), 0.);
-    vec4 specular = pow(f_specular, 8) * vec4(1, 1, 1, 0);
+    vec4 specular = pow(f_specular, 8) * vec4(0.5, 0.5, 0.5, 0);
 
     gl_FragColor = vec4(transmissive, 1.) + specular;
     // gl_FragColor = vec4(height_c, specular.r, 0, 1.);
