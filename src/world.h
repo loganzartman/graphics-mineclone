@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <array>
 #include <vector>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -14,7 +13,31 @@
 #include "cubes.h"
 
 constexpr static int chunk_size = 64;
-using Chunk = std::array<std::array<std::array<Block, chunk_size>, chunk_size>, chunk_size>;
+struct Chunk {
+    Chunk() : data(nullptr) {}
+    void create() {
+        data = new Block[chunk_size * chunk_size * chunk_size];
+    }
+    void destroy() {
+        delete[] data;
+    }
+
+    Block& operator()(const glm::ivec3& pos) {
+        if (!in_bounds(pos)) {
+            std::stringstream msg;
+            msg << "Position out of bounds: " << glm::to_string(pos);
+            throw std::runtime_error(msg.str());
+        }
+        return data[pos.x * chunk_size * chunk_size + pos.y * chunk_size + pos.z];
+    }
+
+    bool in_bounds(glm::ivec3 pos) const {
+        return pos.x >= 0 && pos.y >= 0 && pos.z >= 0 &&
+               pos.x < chunk_size && pos.y < chunk_size && pos.z < chunk_size;
+    }
+
+    Block* data;
+};
 
 struct World {
     World(Cubes& cubes, Cubes& water_cubes) : cubes(cubes), water_cubes(water_cubes) {}
@@ -31,10 +54,10 @@ struct World {
         glm::ivec2 chunk_pos = glm::ivec2(block_pos.x, block_pos.z) / chunk_size;
         Chunk& chunk = get_chunk(chunk_pos);
         glm::ivec3 local_pos = glm::ivec3(block_pos.x % chunk_size, block_pos.y, block_pos.z % chunk_size);
-        if (local_pos.x < 0 || local_pos.y < 0 || local_pos.z < 0 || local_pos.x >= chunk_size || local_pos.y >= chunk_size || local_pos.z >= chunk_size) {
+        if (!chunk.in_bounds(local_pos)) {
             return Block();
         }
-        return chunk[local_pos.x][local_pos.y][local_pos.z];
+        return chunk(local_pos);
     }
 
     Chunk& get_chunk(glm::ivec2 chunk_pos) {
@@ -65,6 +88,7 @@ struct World {
         while (it != chunk_store.end()) {
             const glm::ivec2& chunk_pos = it->first;
             if (chunk_pos.x < x0 || chunk_pos.y < z0 || chunk_pos.x > x1 || chunk_pos.y > z1) {
+                it->second.destroy();
                 it = chunk_store.erase(it);
             } else {
                 ++it;
@@ -81,6 +105,7 @@ struct World {
 
     void free_chunk(glm::ivec2 chunk_pos) {
         std::cout << "freeing chunk " << glm::to_string(chunk_pos) << std::endl;
+        chunk_store[chunk_pos].destroy();
         chunk_store.erase(chunk_pos);
         cubes_dirty = true;
     }
@@ -92,6 +117,7 @@ struct World {
     Chunk gen_chunk(glm::ivec2 chunk_pos) {
         std::cout << "generating chunk " << glm::to_string(chunk_pos) << std::endl;
         Chunk chunk;
+        chunk.create();
         for (int x = 0; x < chunk_size; ++x) {
             for (int z = 0; z < chunk_size; ++z) {
                 glm::vec3 perlin_pos = glm::vec3(x, 0, z);
@@ -102,11 +128,11 @@ struct World {
                 int h = (int)(f * 20) + 20;
                 
                 for (int y = h - 1; y <= h; ++y) { 
-                    chunk[x][y][z] = Block(true, (f < 0 ? 1 : f < 0.1 ? 2 : 3));;
+                    chunk({x,y,z}) = Block(true, (f < 0 ? 1 : f < 0.1 ? 2 : 3));;
                 }
                 
                 for (int y = h+1; y <= 12; ++y) {
-                    chunk[x][y][z] = Block(false, 4);
+                    chunk({x,y,z}) = Block(false, 4);
                 }
             }
         }
@@ -118,13 +144,13 @@ struct World {
         std::vector<Cubes::Instance> cube_instances;
         std::vector<Cubes::Instance> water_instances;
 
-        for (const auto& it : chunk_store) {
+        for (auto& it : chunk_store) {
             const glm::ivec2& chunk_pos = it.first;
-            const Chunk& chunk = it.second;
+            Chunk& chunk = it.second;
             for (int x = 0; x < chunk_size; ++x) {
                 for (int y = 0; y < chunk_size; ++y) {
                     for (int z = 0; z < chunk_size; ++z) {
-                        Block b = chunk[x][y][z];
+                        Block b = chunk({x,y,z});
                         Cubes::Instance inst(
                                 glm::vec3(x + chunk_pos.x * chunk_size, y, z + chunk_pos.y * chunk_size),
                                 b.type

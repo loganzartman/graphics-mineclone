@@ -2,6 +2,7 @@
 #include <random>
 #include <cmath>
 #include <array>
+#include <chrono>
 
 #include <glad/glad.h>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -19,6 +20,8 @@
 #include "noise.h"
 #include "world.h"
 
+using namespace std::chrono;
+
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
     water_program.vertex({"cube.vs"}).fragment({"water.fs"}).geometry({"cube.gs"}).compile();
@@ -34,9 +37,14 @@ void Game::update() {
     int window_w, window_h;
     glfwGetFramebufferSize(window, &window_w, &window_h);
 
+    auto _wu_start = high_resolution_clock::now();
     world.load_nearby(player_position);
     world.unload_far(player_position);
+    auto _wu_end = high_resolution_clock::now();
     world.update_cubes_instances();
+    auto _gu_end = high_resolution_clock::now();
+    // std::cout << "world generation in " << duration_cast<microseconds>(_wu_end - _wu_start).count() << std::endl;
+    // std::cout << "cubes update in " << duration_cast<microseconds>(_gu_end - _wu_end).count() << std::endl;
 
     const glm::vec3 camera_position = player_position + glm::vec3(0, 0.5, 0);
     glm::mat4 view_matrix = glm::lookAt(camera_position, camera_position + look, up);
