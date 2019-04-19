@@ -4,7 +4,7 @@ in vec3 uvw;
 uniform vec3 camera_position;
 uniform float time;
 
-const float inf = 1e420;
+const float inf = 1e20;
 const vec3 clouds_pos = vec3(0, 100, 0);
 const float clouds_vis_dist = 500;
 
