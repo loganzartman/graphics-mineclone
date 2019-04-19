@@ -174,21 +174,15 @@ void Game::updateOrientation() {
     if (glm::length(mouse_pos_vector) == 0) {
 		return;}
 	mouse_pos_vector.x *= -1.f;
-    int window_w, window_h;
-    glfwGetFramebufferSize(window, &window_w, &window_h);
-     glm::mat4 projection_matrix = glm::perspective(
-        glm::radians(80.f),
-        ((float)window_w)/window_h,
-        0.1f,
-        100.f
-    );
+    yaw += mouse_pos_vector.x;
+    yaw = fmod(yaw, 360);
 
-    glm::mat4 view_matrix = glm::lookAt(glm::vec3(player_position), glm::vec3(player_position) + look, up);
+    if (abs(pitch + mouse_pos_vector.y) <= 85) {
+        pitch += mouse_pos_vector.y;
+    }
+    glm::quat rot = glm::quat(glm::vec3(-glm::radians(pitch), -glm::radians(yaw), 0));
 
-	const glm::vec3 world_vector = glm::vec3(glm::inverse(projection_matrix * view_matrix) * glm::vec4(mouse_pos_vector, 1., 1.));
-	const glm::vec3 rotation_axis = glm::cross(look, world_vector);
-	const glm::mat4 rotation = glm::rotate(mouse_speed * glm::length(mouse_pos_vector), rotation_axis);
-	look = glm::vec3(rotation * glm::vec4(look, 0.));
+    look = rot * glm::vec3(0,0,1);
 }
 
 glm::ivec3 Game::gridWorld(const glm::vec3& pos) {

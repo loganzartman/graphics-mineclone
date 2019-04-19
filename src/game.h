@@ -35,6 +35,8 @@ struct Game {
     float gravity = 0.05;
     float max_speed = 0.2;
     float mouse_speed = 0.003;
+    float pitch = 0;
+    float yaw = 0;
     glm::vec3 player_position = glm::vec3(38,28,45); // negative chunk indices don't load so well rn
     glm::vec3 player_velocity = glm::vec3(0,0,0);
     glm::vec3 player_motion = glm::vec3(0,0,0);
