@@ -25,7 +25,7 @@ using namespace std::chrono;
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
     water_program.vertex({"cube.vs"}).fragment({"perlin.glsl", "water.fs"}).geometry({"cube.gs"}).compile();
-    skybox_program.vertex({"skybox.vs"}).fragment({"skybox.fs"}).compile();
+    skybox_program.vertex({"skybox.vs"}).fragment({"perlin.glsl", "skybox.fs"}).compile();
 
     skybox.add_attribs({3});
     skybox.vertices.set_data(std::vector<glm::vec3>{
@@ -166,6 +166,8 @@ void Game::update() {
         glUniformMatrix4fv(skybox_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
         glUniformMatrix4fv(skybox_program.uniform_loc("view"), 1, false, glm::value_ptr(view_matrix));
         glUniformMatrix4fv(skybox_program.uniform_loc("transform"), 1, false, glm::value_ptr(skybox_transform));
+        glUniform1f(skybox_program.uniform_loc("time"), glfwGetTime());
+        glUniform3fv(skybox_program.uniform_loc("camera_position"), 1, glm::value_ptr(camera_position));
         skybox.bind();
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, std::array<uint, 36>{
             0, 3, 2, 2, 1, 0, 0, 5, 4, 4, 3, 0, 0, 1, 6, 6, 5, 0, 5, 6, 7, 7,
