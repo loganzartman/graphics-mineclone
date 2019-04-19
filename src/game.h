@@ -45,8 +45,10 @@ struct Game {
 
     gfx::Program cube_program = gfx::Program("cube");
     gfx::Program water_program = gfx::Program("cube_water");
+    gfx::Program skybox_program = gfx::Program("skybox");
     Cubes cubes;
     Cubes water_cubes;
+    gfx::VAO skybox;
 
     gfx::RenderTexture background_tex;
     gfx::RenderTexture render_tex;

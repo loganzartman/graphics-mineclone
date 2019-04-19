@@ -25,6 +25,14 @@ using namespace std::chrono;
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
     water_program.vertex({"cube.vs"}).fragment({"perlin.glsl", "water.fs"}).geometry({"cube.gs"}).compile();
+    skybox_program.vertex({"skybox.vs"}).fragment({"skybox.fs"}).compile();
+
+    skybox.add_attribs({3});
+    skybox.vertices.set_data(std::vector<glm::vec3>{
+        {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 1.0f}, 
+        {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, 0.0f},
+        {1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}
+    });
     handleResize();
 }
 
@@ -149,6 +157,20 @@ void Game::update() {
         glViewport(0, 0, window_w, window_h);
         glClearColor(0.2f,0.2f,0.2f,1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        skybox_program.use();
+        const glm::mat4 skybox_transform = 
+            glm::translate(player_position) * 
+            glm::scale(glm::vec3(1000.f, 1000.f, 1000.f)) * 
+            glm::translate(glm::vec3(-0.5f, -0.5f, -0.5f));
+        glUniformMatrix4fv(skybox_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
+        glUniformMatrix4fv(skybox_program.uniform_loc("view"), 1, false, glm::value_ptr(view_matrix));
+        glUniformMatrix4fv(skybox_program.uniform_loc("transform"), 1, false, glm::value_ptr(skybox_transform));
+        skybox.bind();
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, std::array<uint, 36>{
+            0, 3, 2, 2, 1, 0, 0, 5, 4, 4, 3, 0, 0, 1, 6, 6, 5, 0, 5, 6, 7, 7,
+            4, 5, 1, 2, 7, 7, 6, 1, 3, 4, 7, 7, 2, 3
+        }.data());
 
         cube_program.use();
         glUniformMatrix4fv(cube_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
