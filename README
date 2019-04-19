@@ -1,0 +1,15 @@
+Logan Zartman lz5735
+Emran Shafaq es35478
+
+Notes on required features:
+If infinite world is a required feature, there are some physics issues in chunks with negative coordinates. Otherwise, all features are working as intended.
+We ported our perlin noise generator to GLSL, and use it for water and clouds. Unfortunately, it is not very fast, so we use a cheaper coherent noise function borrowed from the internet for block texturing.
+
+Optional features:
+* Procedurally generated sky (by performing ray-plane intersection and sampling perlin noise)
+* Many kinds of cubes
+* Advanced water rendering
+    * two-pass solution that renders background (non-water blocks) color and depth to texture and then composites water blocks on top
+    * water gets more opaque as it is deeper
+    * normals (and specular highlights) computed using perlin noise
+    * screen-space refraction (fake refraction of things on screen) by using refracted ray to compute an offset when sampling the background texture during water rendering pass.
