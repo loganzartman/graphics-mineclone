@@ -24,7 +24,7 @@ using namespace std::chrono;
 
 void Game::init() {
     cube_program.vertex({"cube.vs"}).fragment({"noise.glsl", "cube.fs"}).geometry({"cube.gs"}).compile();
-    water_program.vertex({"cube.vs"}).fragment({"water.fs"}).geometry({"cube.gs"}).compile();
+    water_program.vertex({"cube.vs"}).fragment({"perlin.glsl", "water.fs"}).geometry({"cube.gs"}).compile();
     handleResize();
 }
 
@@ -160,6 +160,7 @@ void Game::update() {
     display_quad.set_texture(background_tex.color_id).set_depth(background_tex.depth_id).draw();
 
     water_program.use();
+    glDisable(GL_BLEND); 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, background_tex.color_id);
     glActiveTexture(GL_TEXTURE1);
@@ -170,7 +171,7 @@ void Game::update() {
     glUniform1f(water_program.uniform_loc("z_near"), 0.1f);
     glUniform1f(water_program.uniform_loc("z_far"), 1000.f);
     glUniform1f(water_program.uniform_loc("time"), glfwGetTime());
-    glUniform3fv(water_program.uniform_loc("look"), 1, glm::value_ptr(look));
+    glUniform3fv(water_program.uniform_loc("camera_position"), 1, glm::value_ptr(camera_position));
     glUniformMatrix4fv(water_program.uniform_loc("projection"), 1, false, glm::value_ptr(projection_matrix));
     glUniformMatrix4fv(water_program.uniform_loc("view"), 1, false, glm::value_ptr(view_matrix));
     glUniform2i(water_program.uniform_loc("resolution"), window_w, window_h);
