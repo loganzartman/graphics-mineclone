@@ -130,6 +130,7 @@ private:
             // The program is useless now. So delete it.
             glDeleteProgram(shader);
             const std::string err = "GLSL linking error for program: ";
+			std::cout << err + name + "\n" + info_log.data();
             throw std::runtime_error(err + name + "\n" + info_log.data());
 		}
     }

@@ -12,6 +12,8 @@
 #include "block.h"
 #include "cubes.h"
 
+#undef far
+
 constexpr static int chunk_size = 64;
 struct Chunk {
     Chunk() : data(nullptr) {}

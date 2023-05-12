@@ -5,6 +5,8 @@
 
 #include <glm/glm.hpp>
 
+typedef unsigned int uint;
+
 namespace noise {
 static uint hash(uint a) {
     a = (a+0x7ed55d16) + (a<<12);
