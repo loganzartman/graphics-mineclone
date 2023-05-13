@@ -45,6 +45,11 @@ void Game::update() {
     int window_w, window_h;
     glfwGetFramebufferSize(window, &window_w, &window_h);
 
+	const double time = glfwGetTime();
+	const double dt = time - prevTime;
+	prevTime = time;
+	const float timeScale = static_cast<float>(dt / (1. / 60.));
+
     auto _wu_start = high_resolution_clock::now();
     world.load_nearby(player_position);
     world.unload_far(player_position);
@@ -73,37 +78,37 @@ void Game::update() {
     }
 
     if (key_pressed[GLFW_KEY_SPACE] && on_ground) {
-        player_velocity += glm::vec3(0, 1, 0);
+        player_velocity += glm::vec3(0, 0.4, 0);
         on_ground = false;
     }
 
     const glm::vec3 tangent = glm::cross(-look, up);
     bool any_key = false;
     if (key_pressed[GLFW_KEY_W]) {
-        applyInputAccel(look * acceleration);
+        applyInputAccel(look * acceleration * timeScale);
         any_key = true;
     }
     if (key_pressed[GLFW_KEY_S]) {
-        applyInputAccel(look * (-acceleration));
+        applyInputAccel(look * (-acceleration) * timeScale);
         any_key = true;
     }
     if (key_pressed[GLFW_KEY_D]) {
-        applyInputAccel(tangent * (-acceleration));
+        applyInputAccel(tangent * (-acceleration) * timeScale);
         any_key = true;
     }
     if (key_pressed[GLFW_KEY_A]) {
-        applyInputAccel(tangent * acceleration);
+        applyInputAccel(tangent * acceleration * timeScale);
         any_key = true;
     } 
     if (!any_key) {
-        player_motion *= 0.8;
+        player_motion *= (1.0 - 0.2 * timeScale);
     }
 
     if (gravity_switch) {
-        player_velocity += (-up) * gravity;
+        player_velocity += (-up) * gravity * timeScale;
     }
 
-    glm::vec3 movement = player_motion + player_velocity;
+    glm::vec3 movement = (player_motion + player_velocity) * timeScale;
     int steps = glm::length(movement) * 500;
     glm::vec3 step = movement / (float)steps;
     // std::cout << steps << std::endl;
@@ -142,7 +147,7 @@ void Game::update() {
         }
     }
 
-    player_velocity *= 0.98;
+    player_velocity *= (1.0 - 0.02 * timeScale);
 
     glViewport(0, 0, window_w, window_h);
     glClearColor(0.f,0.f,0.f,1.0f);

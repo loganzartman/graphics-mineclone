@@ -24,6 +24,7 @@ struct Game {
     void applyInputAccel(const glm::vec3& acc);
 
 //  Window, mouse, keyboard attributes
+	double prevTime;
     GLFWwindow* window;
     std::unordered_map<int, bool> key_pressed;
     glm::vec2 mouse_position = glm::vec2(-1,-1);
@@ -31,8 +32,8 @@ struct Game {
     glm::vec2 mouse_pos_vector = glm::vec2(0,0);
     bool gravity_switch = false;
     bool on_ground = false;
-    float acceleration = 0.025;
-    float gravity = 0.05;
+    float acceleration = 0.02;
+    float gravity = 0.025;
     float max_speed = 0.2;
     float mouse_speed = 0.3;
     float pitch = 0;
