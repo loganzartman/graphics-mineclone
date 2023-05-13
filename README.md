@@ -17,9 +17,6 @@ a clone of everyone's favorite voxel-based game
 # dependencies
 * OpenGL 3.3 support
 * CMake 3.10
-* PkgConfig
-* glfw3
-* glm
 
 # building
 * `make` to build
