@@ -57,7 +57,14 @@ void main() {
     vec3 refracted_dir = normalize(fake_refract(ray_direction, frag_normal, 1.33));
     vec3 refracted_ray = refracted_dir * d_total;
     vec3 refraction_offset = refracted_ray - project(refracted_ray, ray_direction);
-    vec3 color = texture(background, gl_FragCoord.xy / resolution + refraction_offset.xz * 0.03).rgb;
+    vec2 refracted_pos = screen_pos + refraction_offset.xz * 0.01; 
+    vec3 color = texture(background, refracted_pos).rgb;
+
+    // recompute depth with refraction
+    d_background_cam = depth_to_ndc(texture(depth, refracted_pos).x);
+    d_foreground_cam = gl_FragCoord.z / gl_FragCoord.w;
+    d_total = d_background_cam - d_foreground_cam;
+
     float f = clamp(d_total / 5., 0.5, 1);
     float f2 = clamp(d_total / 10., 0, 1);
     vec3 water_color = vec3(0.1, 0.5, 0.8);
